@@ -1,5 +1,7 @@
 FROM docker:dind
 
-RUN apk -U add ansible vim git curl bash
+RUN apk -U add ansible vim git curl bash py-pip
+
+RUN pip3 install docker
 
 ENTRYPOINT [ "dockerd-entrypoint.sh" ]
