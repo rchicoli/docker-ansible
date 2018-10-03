@@ -1,0 +1,5 @@
+FROM docker:dind
+
+RUN apk -U add ansible vim git curl
+
+ENTRYPOINT [ "dockerd-entrypoint.sh" ]
