@@ -1,5 +1,5 @@
 FROM docker:dind
 
-RUN apk -U add ansible vim git curl
+RUN apk -U add ansible vim git curl bash
 
 ENTRYPOINT [ "dockerd-entrypoint.sh" ]
