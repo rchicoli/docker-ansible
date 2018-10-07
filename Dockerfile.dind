@@ -1,7 +1,20 @@
 FROM docker:dind
 
-RUN apk -U add ansible vim git curl bash py-pip
+ENV DOCKERD_RUN true
+ENV DOCKERD_STREAM_LOGS false
+ENV DOCKERD_RETRY 10
 
-RUN pip3 install docker
+RUN apk add --no-cache ansible \
+    vim git curl bash py-pip \
+    sudo sshpass openssh-client \
+    shadow
 
-ENTRYPOINT [ "dockerd-entrypoint.sh" ]
+RUN chsh --shell /bin/bash root
+
+RUN pip3 --no-cache-dir install docker ansible-lint yamllint \
+    pywinrm boto3 zabbix-api
+
+COPY yamllint /root/.yamllint
+COPY custom-entrypoint.sh /usr/local/bin/custom-entrypoint.sh
+
+ENTRYPOINT ["custom-entrypoint.sh"]
