@@ -12,13 +12,20 @@ function ctrl_c() {
 #--------------------------#
 # Docker in docker daemon  #
 #--------------------------#
+: ${DOCKERD_LOG_STDOUT:="/dev/stdout"}
+: ${DOCKERD_LOG_STDERR:="/dev/stderr"}
+
 if [[ "$DOCKERD_RUN" == "true" ]]; then
+
     if [[ "$DOCKERD_STREAM_LOGS" == "false" ]]; then
-        # log only the last message to a file
-        dockerd-entrypoint.sh &> /var/log/docker.log &
-    else
-        dockerd-entrypoint.sh &
+        DOCKERD_LOG_STDOUT="/dev/null"
+        DOCKERD_LOG_STDERR="/dev/null"
     fi
+
+    dockerd \
+		--host=unix:///var/run/docker.sock \
+		--host=tcp://0.0.0.0:2375 \
+		$DOCKERD_OPTIONS >$DOCKERD_LOG_STDOUT 2>$DOCKERD_LOG_STDERR &
 
     x=0
     while [[ "$x" -lt "$DOCKERD_RETRY" ]] && [[ ! $(docker ps) ]]; do
