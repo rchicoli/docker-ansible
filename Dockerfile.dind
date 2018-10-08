@@ -1,18 +1,28 @@
 FROM docker:dind
 
+ARG ANSIBLE_VERSION=2.6.4
+
+ENV ANSIBLE_VERSION $ANSIBLE_VERSION
 ENV DOCKERD_RUN true
 ENV DOCKERD_STREAM_LOGS false
 ENV DOCKERD_RETRY 10
 
-RUN apk add --no-cache ansible \
-    vim git curl bash py-pip \
-    sudo sshpass openssh-client \
-    shadow
+RUN apk add --no-cache \
+        vim git curl bash py-pip \
+        sudo sshpass openssh-client \
+        shadow && \
+    apk add --no-cache --virtual .build-deps \
+        gcc openssl-dev libffi-dev \
+        python-dev build-base && \
+    pip --no-cache-dir install --upgrade pip && \
+        pip --no-cache-dir install ansible==$ANSIBLE_VERSION \
+        docker ansible-lint yamllint \
+        pywinrm boto3 zabbix-api && \
+    apk del .build-deps && \
+    rm -r /root/.cache
 
-RUN chsh --shell /bin/bash root
-
-RUN pip3 --no-cache-dir install docker ansible-lint yamllint \
-    pywinrm boto3 zabbix-api
+RUN chsh --shell /bin/bash root && \
+        useradd app -s /sbin/nologin --create-home
 
 COPY yamllint /root/.yamllint
 COPY custom-entrypoint.sh /usr/local/bin/custom-entrypoint.sh

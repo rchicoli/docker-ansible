@@ -45,17 +45,19 @@ base64_decode() {
   echo "$1" | tr -d '\n' | base64 -d
 }
 
-mkdir -p ~/.ssh && chmod 700 ~/.ssh
+if [[ "$HOME" != "/" ]]; then
+    mkdir -p "${HOME}/.ssh" && chmod 700 "${HOME}/.ssh"
+fi
 
 if [[ ! -z "$SSH_PRIVATE_KEY" ]]; then
-    echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa && \
-    chmod 600 ~/.ssh/id_rsa
+    echo "$SSH_PRIVATE_KEY" > "${HOME}/.ssh/id_rsa" && \
+    chmod 600 "${HOME}/.ssh/id_rsa"
     unset SSH_PRIVATE_KEY
 fi
 
 if [[ ! -z "$SSH_PRIVATE_KEY_B64" ]]; then
-    base64_decode "$SSH_PRIVATE_KEY_B64" > ~/.ssh/id_dsa && \
-    chmod 600 ~/.ssh/id_dsa
+    base64_decode "$SSH_PRIVATE_KEY_B64" > "${HOME}/.ssh/id_dsa" && \
+    chmod 600 "${HOME}/.ssh/id_dsa"
     unset SSH_PRIVATE_KEY_B64
 fi
 
