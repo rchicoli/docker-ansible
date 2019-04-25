@@ -1,0 +1,8 @@
+[Unit]
+Description=CustomInit
+
+[Service]
+ExecStart=/tmp/custom-init.sh
+
+[Install]
+WantedBy=multi-user.target
